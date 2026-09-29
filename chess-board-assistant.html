@@ -1025,6 +1025,7 @@
                 oninput="state.moveInput = this.value; render(); setTimeout(() => { const input = document.getElementById('moveInput'); if(input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); } }, 0)"
                 placeholder="Enter your move (e.g., e4, Nf3, e8=Q)"
                 ${state.gameOver ? 'disabled' : ''}
+                ${/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'readonly' : ''}
                 class="move-input"
                 autofocus
               />
@@ -1049,11 +1050,11 @@
                   <div class="builder-section">
                     <label class="builder-label">Piece:</label>
                     <div class="builder-buttons">
-                      <button type="button" onclick="state.moveInput += 'K'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♔ K</button>
-                      <button type="button" onclick="state.moveInput += 'Q'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♕ Q</button>
-                      <button type="button" onclick="state.moveInput += 'R'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♖ R</button>
-                      <button type="button" onclick="state.moveInput += 'B'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♗ B</button>
-                      <button type="button" onclick="state.moveInput += 'N'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♘ N</button>
+                      <button type="button" onclick="state.moveInput += 'K'; render()" ${state.gameOver ? 'disabled' : ''}>♔ K</button>
+                      <button type="button" onclick="state.moveInput += 'Q'; render()" ${state.gameOver ? 'disabled' : ''}>♕ Q</button>
+                      <button type="button" onclick="state.moveInput += 'R'; render()" ${state.gameOver ? 'disabled' : ''}>♖ R</button>
+                      <button type="button" onclick="state.moveInput += 'B'; render()" ${state.gameOver ? 'disabled' : ''}>♗ B</button>
+                      <button type="button" onclick="state.moveInput += 'N'; render()" ${state.gameOver ? 'disabled' : ''}>♘ N</button>
                       <button type="button" class="pawn-btn" ${state.gameOver ? 'disabled' : ''} title="Pawn (no letter)">♙</button>
                     </div>
                   </div>
@@ -1061,7 +1062,7 @@
                   <div class="builder-section">
                     <label class="builder-label">Action:</label>
                     <div class="builder-buttons">
-                      <button type="button" onclick="state.moveInput += 'x'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>× Capture</button>
+                      <button type="button" onclick="state.moveInput += 'x'; render()" ${state.gameOver ? 'disabled' : ''}>× Capture</button>
                     </div>
                   </div>
 
@@ -1069,7 +1070,7 @@
                     <label class="builder-label">File (a-h):</label>
                     <div class="builder-buttons files">
                       ${['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(file => `
-                        <button type="button" onclick="state.moveInput += '${file}'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>${file}</button>
+                        <button type="button" onclick="state.moveInput += '${file}'; render()" ${state.gameOver ? 'disabled' : ''}>${file}</button>
                       `).join('')}
                     </div>
                   </div>
@@ -1078,7 +1079,7 @@
                     <label class="builder-label">Rank (1-8):</label>
                     <div class="builder-buttons ranks">
                       ${['1', '2', '3', '4', '5', '6', '7', '8'].map(rank => `
-                        <button type="button" onclick="state.moveInput += '${rank}'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>${rank}</button>
+                        <button type="button" onclick="state.moveInput += '${rank}'; render()" ${state.gameOver ? 'disabled' : ''}>${rank}</button>
                       `).join('')}
                     </div>
                   </div>
@@ -1086,17 +1087,17 @@
                   <div class="builder-section">
                     <label class="builder-label">Special:</label>
                     <div class="builder-buttons special">
-                      <button type="button" onclick="state.moveInput = 'O-O'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>O-O</button>
-                      <button type="button" onclick="state.moveInput = 'O-O-O'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>O-O-O</button>
-                      <button type="button" onclick="state.moveInput += '='; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>= Promote</button>
-                      <button type="button" onclick="state.moveInput += '+'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>+ Check</button>
-                      <button type="button" onclick="state.moveInput += '#'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}># Mate</button>
+                      <button type="button" onclick="state.moveInput = 'O-O'; render()" ${state.gameOver ? 'disabled' : ''}>O-O</button>
+                      <button type="button" onclick="state.moveInput = 'O-O-O'; render()" ${state.gameOver ? 'disabled' : ''}>O-O-O</button>
+                      <button type="button" onclick="state.moveInput += '='; render()" ${state.gameOver ? 'disabled' : ''}>= Promote</button>
+                      <button type="button" onclick="state.moveInput += '+'; render()" ${state.gameOver ? 'disabled' : ''}>+ Check</button>
+                      <button type="button" onclick="state.moveInput += '#'; render()" ${state.gameOver ? 'disabled' : ''}># Mate</button>
                     </div>
                   </div>
 
                   <div class="builder-section">
                     <div class="builder-buttons">
-                      <button type="button" onclick="state.moveInput = ''; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''} class="clear-btn">
+                      <button type="button" onclick="state.moveInput = ''; render()" ${state.gameOver ? 'disabled' : ''} class="clear-btn">
                         ⌫ Clear
                       </button>
                     </div>
