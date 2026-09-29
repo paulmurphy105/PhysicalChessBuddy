@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>♟️ Chess Board Assistant</title>
+  <style>
+    :root {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-input: #3a3a3a;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --accent: #4a9eff;
+      --accent-hover: #6ab0ff;
+      --error: #ff6b6b;
+      --success: #51cf66;
+      --border: #404040;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem 1rem;
+      max-width: 700px;
+    }
+
+    .sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      padding: 2rem 1.5rem;
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar h3 {
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+      font-size: 1.3rem;
+    }
+
+    .sidebar h4 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+      font-size: 1.05rem;
+    }
+
+    .notation-section {
+      margin-bottom: 1rem;
+    }
+
+    .notation-section ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .notation-section li {
+      padding: 0.4rem 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .notation-section code {
+      background: var(--bg-input);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      color: var(--accent);
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .start-game {
+      background: var(--bg-secondary);
+      padding: 2rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .color-selection {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .color-btn {
+      flex: 1;
+      padding: 0.75rem;
+      background: var(--bg-input);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .color-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--bg-secondary);
+    }
+
+    .color-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    select,
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    select:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .help-text {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .new-game-btn,
+    .toggle-sidebar-btn,
+    .toggle-board-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .toggle-board-btn {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .toggle-board-btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .game-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .turn-indicator {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .message {
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-left: 4px solid var(--accent);
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .message.game-over {
+      border-left-color: var(--success);
+      background: rgba(81, 207, 102, 0.1);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .board-container {
+      background: var(--bg-secondary);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .board-label {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+    }
+
+    .chess-board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 0;
+      width: min(100%, 400px);
+      aspect-ratio: 1;
+      border: 2px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .square {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      position: relative;
+    }
+
+    .square.light {
+      background: #f0d9b5;
+    }
+
+    .square.dark {
+      background: #b58863;
+    }
+
+    .piece {
+      font-size: clamp(2rem, 8vw, 3rem);
+      user-select: none;
+      line-height: 1;
+    }
+
+    .piece.white-piece {
+      color: #ffffff;
+      text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+    }
+
+    .piece.black-piece {
+      color: #000000;
+      text-shadow:
+        -1px -1px 0 #666,
+        1px -1px 0 #666,
+        -1px 1px 0 #666,
+        1px 1px 0 #666;
+    }
+
+    .move-input-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .move-input {
+      flex: 1;
+      margin-top: 0;
+    }
+
+    .move-input-form button {
+      white-space: nowrap;
+    }
+
+    .move-builder-container {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+    }
+
+    .move-builder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .move-builder-header h4 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+
+    .toggle-builder-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+    }
+
+    .move-builder {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .builder-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .builder-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .builder-buttons {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .builder-buttons.files,
+    .builder-buttons.ranks {
+      gap: 0.35rem;
+    }
+
+    .builder-buttons button {
+      padding: 0.6rem 0.75rem;
+      font-size: 0.9rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      min-width: 45px;
+      font-weight: 500;
+    }
+
+    .builder-buttons.files button,
+    .builder-buttons.ranks button {
+      padding: 0.5rem;
+      min-width: 40px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .builder-buttons button:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .builder-buttons button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .builder-buttons .pawn-btn {
+      opacity: 0.6;
+    }
+
+    .builder-buttons .pawn-btn:hover:not(:disabled) {
+      opacity: 1;
+    }
+
+    .builder-buttons .clear-btn {
+      background: var(--error);
+      border-color: var(--error);
+      color: white;
+      width: 100%;
+      font-weight: 600;
+    }
+
+    .builder-buttons .clear-btn:hover:not(:disabled) {
+      background: #ff5252;
+      border-color: #ff5252;
+    }
+
+    .builder-buttons.special {
+      gap: 0.5rem;
+    }
+
+    .builder-buttons.special button {
+      flex: 1;
+      min-width: 60px;
+      font-size: 0.85rem;
+    }
+
+    .move-history {
+      margin-top: 2rem;
+      background: var(--bg-secondary);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .move-history h3 {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .moves-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .move-pair {
+      display: grid;
+      grid-template-columns: 40px 1fr 1fr;
+      gap: 1rem;
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .move-pair:last-child {
+      border-bottom: none;
+    }
+
+    .move-number {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .player-move {
+      color: var(--text-primary);
+      font-family: 'Courier New', monospace;
+    }
+
+    .computer-move {
+      color: var(--accent);
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: rgba(74, 158, 255, 0.15);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(74, 158, 255, 0.3);
+    }
+
+    .computer-move.latest {
+      animation: pulse 0.8s ease-out;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(74, 158, 255, 0.7);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 8px rgba(74, 158, 255, 0);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(74, 158, 255, 0);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        display: none;
+      }
+
+      .main-content {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-layout,
+      .container {
+        padding: 1rem 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .header-actions {
+        flex-direction: column;
+      }
+
+      .game-info {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .builder-buttons.special button {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Chess.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <!-- js-chess-engine from CDN (fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/js-chess-engine@1.0.2/dist/js-chess-engine.umd.js"></script>
+
+  <script>
+    // Game state
+    const state = {
+      gameStarted: false,
+      elo: 1500,
+      playerColor: 'w',
+      chess: null,
+      moveHistory: [],
+      currentTurn: 'w',
+      message: '',
+      gameOver: false,
+      showSidebar: true,
+      showMoveBuilder: true,
+      showBoard: false,
+      moveInput: '',
+      hint: '',
+      stockfish: null,
+      useStockfish: false
+    };
+
+    // Try to initialize Stockfish (will fallback to js-chess-engine on failure)
+    async function tryInitStockfish() {
+      // Skip on file:// protocol
+      if (window.location.protocol === 'file:') {
+        console.log('📁 Running on file:// - using js-chess-engine');
+        return;
+      }
+
+      try {
+        console.log('🚀 Attempting to load Stockfish...');
+        state.stockfish = new Worker('./stockfish.js');
+
+        state.stockfish.onmessage = function(event) {
+          const line = event.data;
+          if (line === 'uciok') {
+            state.useStockfish = true;
+            console.log('✅ Stockfish loaded! (Grandmaster mode)');
+          }
+        };
+
+        state.stockfish.onerror = function(error) {
+          console.log('⚠️ Stockfish failed - using js-chess-engine fallback');
+        };
+
+        state.stockfish.postMessage('uci');
+      } catch (error) {
+        console.log('⚠️ Stockfish unavailable - using js-chess-engine fallback');
+      }
+    }
+
+
+    // Initialize
+    function init() {
+      render();
+      document.getElementById('moveInput')?.focus();
+    }
+
+    // Start new game
+    async function startNewGame() {
+      state.chess = new window.Chess();
+      state.gameStarted = true;
+      state.moveHistory = [];
+      state.currentTurn = state.chess.turn();
+      state.gameOver = false;
+      state.moveInput = '';
+      state.message = `Game started! ${state.playerColor === 'w' ? 'White' : 'Black'} to move.`;
+
+      // If player is black, computer makes first move
+      if (state.playerColor === 'b') {
+        const computerMove = await getComputerMove();
+        if (computerMove) {
+          state.chess.move(computerMove);
+          state.moveHistory.push({ player: null, computer: computerMove });
+          state.currentTurn = state.chess.turn();
+          state.message = `Computer plays: ${computerMove}. Your turn!`;
+        }
+      }
+
+      render();
+      setTimeout(() => document.getElementById('moveInput')?.focus(), 100);
+    }
+
+    // Make move
+    async function makeMove(e) {
+      e.preventDefault();
+      const move = state.moveInput.trim();
+      if (!move) return;
+
+      state.message = '';
+
+      try {
+        const result = state.chess.move(move);
+
+        if (!result) {
+          state.message = `Error: Invalid move`;
+          render();
+          return;
+        }
+
+        // Check if game is over
+        if (state.chess.game_over()) {
+          let status = 'Game over';
+          if (state.chess.in_checkmate()) status = 'Checkmate';
+          else if (state.chess.in_draw()) status = 'Draw';
+          else if (state.chess.in_stalemate()) status = 'Stalemate';
+
+          state.moveHistory.push({ player: move, computer: null });
+          state.gameOver = true;
+          state.message = `Game Over: ${status}`;
+          state.moveInput = '';
+          render();
+          return;
+        }
+
+        // Get computer move
+        const computerMove = await getComputerMove();
+
+        state.moveHistory.push({ player: move, computer: computerMove });
+
+        if (computerMove) {
+          state.chess.move(computerMove);
+        }
+
+        state.currentTurn = state.chess.turn();
+        state.moveInput = '';
+
+        // Check if game is over after computer move
+        if (state.chess.game_over()) {
+          let status = 'Game over';
+          if (state.chess.in_checkmate()) status = 'Checkmate';
+          else if (state.chess.in_draw()) status = 'Draw';
+          else if (state.chess.in_stalemate()) status = 'Stalemate';
+
+          state.gameOver = true;
+          state.message = `Game Over: ${status}`;
+        } else {
+          const inCheck = state.chess.in_check();
+          state.message = `Computer plays: ${computerMove}${inCheck ? ' (Check!)' : ''}`;
+        }
+
+        render();
+        setTimeout(() => document.getElementById('moveInput')?.focus(), 100);
+
+      } catch (error) {
+        state.message = `Error: ${error.message}`;
+        render();
+      }
+    }
+
+    // Get computer move using Stockfish
+    async function getComputerMove() {
+      // Use Stockfish if available, otherwise js-chess-engine
+      if (state.useStockfish) {
+        return await getStockfishMove(state.elo);
+      }
+      return getJsChessEngineMove(state.elo);
+    }
+
+    // Stockfish move (only called if Stockfish loaded successfully)
+    function getStockfishMove(elo) {
+
+      return new Promise((resolve) => {
+        let resolved = false;
+
+        // Map ELO (800-2800) to Stockfish skill level (0-20)
+        // 800 = 0, 1800 = 10, 2800 = 20
+        const stockfishSkill = Math.round(Math.max(0, Math.min(20, (state.elo - 800) / 100)));
+
+        const messageHandler = (event) => {
+          if (resolved) return;
+
+          const message = event.data;
+
+          if (typeof message === 'string' && message.startsWith('bestmove')) {
+            const match = message.match(/bestmove ([a-h][1-8][a-h][1-8][qrbn]?)/);
+            if (match) {
+              const uciMove = match[1];
+
+              // Convert UCI move to SAN
+              const legalMoves = state.chess.moves({ verbose: true });
+              const matchingMove = legalMoves.find(m =>
+                m.from === uciMove.substring(0, 2) &&
+                m.to === uciMove.substring(2, 4)
+              );
+
+              resolved = true;
+              state.stockfish.onmessage = function() {}; // Clear handler
+
+              if (matchingMove) {
+                resolve(matchingMove.san);
+              } else {
+                // Fallback
+                const moves = state.chess.moves();
+                resolve(moves[Math.floor(Math.random() * moves.length)]);
+              }
+            }
+          }
+        };
+
+        state.stockfish.onmessage = messageHandler;
+
+        // Send commands to Stockfish
+        state.stockfish.postMessage(`setoption name Skill Level value ${stockfishSkill}`);
+        state.stockfish.postMessage('ucinewgame');
+        state.stockfish.postMessage(`position fen ${state.chess.fen()}`);
+        state.stockfish.postMessage('go movetime 1000'); // Think for 1 second
+
+        // Timeout fallback
+        setTimeout(() => {
+          if (!resolved) {
+            resolved = true;
+            state.stockfish.onmessage = function() {};
+            const moves = state.chess.moves();
+            resolve(moves[Math.floor(Math.random() * moves.length)]);
+          }
+        }, 3000);
+      });
+    }
+
+    // js-chess-engine fallback
+    function getJsChessEngineMove(elo) {
+      try {
+        const fen = state.chess.fen();
+        const depth = Math.max(1, Math.min(5, Math.round((elo - 800) / 500) + 1));
+        const game = new jsChessEngine.Game(fen);
+        const aiMoveResult = jsChessEngine.aiMove(game.exportJson(), depth);
+        const from = Object.keys(aiMoveResult)[0];
+        const to = aiMoveResult[from];
+
+        if (!from || !to) {
+          const moves = state.chess.moves();
+          return moves[Math.floor(Math.random() * moves.length)];
+        }
+
+        const moveStr = from.toLowerCase() + to.toLowerCase();
+        const legalMoves = state.chess.moves({ verbose: true });
+        const matchingMove = legalMoves.find(m =>
+          m.from === moveStr.substring(0, 2) && m.to === moveStr.substring(2, 4)
+        );
+
+        return matchingMove ? matchingMove.san : state.chess.moves()[0];
+      } catch (error) {
+        console.error('AI error:', error);
+        return state.chess.moves()[0];
+      }
+    }
+
+    // Get hint for best move for White
+    async function getHint() {
+      state.hint = 'Analyzing...';
+      render();
+
+      // Use Stockfish if available, otherwise js-chess-engine at max depth
+      let bestMove;
+      if (state.useStockfish) {
+        bestMove = await getStockfishMove(2800);
+        state.hint = `💡 Best move for White: ${bestMove} (Stockfish)`;
+      } else {
+        bestMove = getJsChessEngineMove(2800);
+        state.hint = `💡 Best move for White: ${bestMove}`;
+      }
+      render();
+    }
+
+    // Render board
+    function renderBoard() {
+      if (!state.chess) return '';
+
+      const position = state.chess.fen().split(' ')[0];
+      let rows = position.split('/');
+
+      if (state.playerColor === 'b') {
+        rows = rows.reverse();
+      }
+
+      const pieceSymbols = {
+        'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+        'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+      };
+
+      const board = [];
+
+      rows.forEach((row, rowIndex) => {
+        let colIndex = 0;
+        const rowChars = state.playerColor === 'b' ? row.split('').reverse().join('') : row;
+
+        for (let char of rowChars) {
+          if (isNaN(char)) {
+            const isLight = (rowIndex + colIndex) % 2 === 0;
+            const isWhitePiece = char === char.toUpperCase();
+            board.push({
+              piece: pieceSymbols[char],
+              isLight,
+              isWhitePiece
+            });
+            colIndex++;
+          } else {
+            const emptyCount = parseInt(char);
+            for (let i = 0; i < emptyCount; i++) {
+              const isLight = (rowIndex + colIndex) % 2 === 0;
+              board.push({
+                piece: '',
+                isLight,
+                isWhitePiece: null
+              });
+              colIndex++;
+            }
+          }
+        }
+      });
+
+      return `
+        <div class="board-container">
+          <div class="board-label">
+            ${state.playerColor === 'w' ? "White's Perspective" : "Black's Perspective"}
+          </div>
+          <div class="chess-board">
+            ${board.map(square => `
+              <div class="square ${square.isLight ? 'light' : 'dark'}">
+                ${square.piece ? `<span class="piece ${square.isWhitePiece ? 'white-piece' : 'black-piece'}">${square.piece}</span>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Render
+    function render() {
+      const app = document.getElementById('app');
+
+      if (!state.gameStarted) {
+        app.innerHTML = `
+          <div class="container">
+            <h1>♟️ Chess Board Assistant</h1>
+            <p class="subtitle">Play chess on your physical board with computer assistance</p>
+
+            <div class="start-game">
+              <label>
+                Play As:
+                <div class="color-selection">
+                  <button class="color-btn ${state.playerColor === 'w' ? 'selected' : ''}" onclick="state.playerColor = 'w'; render()">
+                    ⚪ White
+                  </button>
+                  <button class="color-btn ${state.playerColor === 'b' ? 'selected' : ''}" onclick="state.playerColor = 'b'; render()">
+                    ⚫ Black
+                  </button>
+                </div>
+              </label>
+
+              <label>
+                Computer ELO Rating
+                <input
+                  type="number"
+                  value="${state.elo}"
+                  oninput="state.elo = parseInt(this.value) || 1500"
+                  min="800"
+                  max="2800"
+                  step="100"
+                />
+              </label>
+              <p class="help-text">
+                <strong>800-1200:</strong> Beginner - Learning basics<br>
+                <strong>1200-1600:</strong> Intermediate - Club player<br>
+                <strong>1600-2000:</strong> Advanced - Strong club player<br>
+                <strong>2000-2400:</strong> Expert - Master level<br>
+                <strong>2400-2800:</strong> Elite - Grandmaster level
+              </p>
+
+              <button onclick="startNewGame()" class="start-btn">Start New Game</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Game view
+      app.innerHTML = `
+        <div class="app-layout">
+          <div class="main-content">
+            <div class="header">
+              <h1>♟️ Chess Board Assistant</h1>
+              <div class="header-actions">
+                <button onclick="state.showBoard = !state.showBoard; render()" class="toggle-board-btn">
+                  ${state.showBoard ? '🙈 Hide Board' : '👁️ Show Board'}
+                </button>
+                <button onclick="state.showSidebar = !state.showSidebar; render()" class="toggle-sidebar-btn">
+                  ${state.showSidebar ? '◀ Hide Guide' : '▶ Show Guide'}
+                </button>
+                <button onclick="state.gameStarted = false; render()" class="new-game-btn">
+                  New Game
+                </button>
+              </div>
+            </div>
+
+            <div class="game-info">
+              <span>Playing as: ${state.playerColor === 'w' ? '⚪ White' : '⚫ Black'}</span>
+              <span>Computer ELO: ${state.elo}</span>
+              <span class="turn-indicator">
+                Turn: ${state.currentTurn === 'w' ? '⚪ White' : '⚫ Black'}
+              </span>
+            </div>
+
+            ${state.message ? `<div class="message ${state.gameOver ? 'game-over' : ''}">${state.message}</div>` : ''}
+
+            ${state.hint ? `<div class="message" style="border-left-color: #51cf66; background: rgba(81, 207, 102, 0.1);">${state.hint}</div>` : ''}
+
+            ${state.showBoard ? renderBoard() : ''}
+
+            <form onsubmit="makeMove(event)" class="move-input-form">
+              <input
+                type="text"
+                id="moveInput"
+                value="${state.moveInput}"
+                oninput="state.moveInput = this.value; render(); setTimeout(() => { const input = document.getElementById('moveInput'); if(input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); } }, 0)"
+                placeholder="Enter your move (e.g., e4, Nf3, e8=Q)"
+                ${state.gameOver ? 'disabled' : ''}
+                class="move-input"
+                autofocus
+              />
+              <button type="submit" ${state.gameOver || !state.moveInput.trim() ? 'disabled' : ''}>
+                Make Move
+              </button>
+              <button type="button" onclick="getHint()" ${state.gameOver ? 'disabled' : ''} style="background: #51cf66; border-color: #51cf66;">
+                💡 Hint
+              </button>
+            </form>
+
+            <div class="move-builder-container">
+              <div class="move-builder-header">
+                <h4>Move Builder</h4>
+                <button onclick="state.showMoveBuilder = !state.showMoveBuilder; render()" class="toggle-builder-btn" type="button">
+                  ${state.showMoveBuilder ? 'Hide' : 'Show'}
+                </button>
+              </div>
+
+              ${state.showMoveBuilder ? `
+                <div class="move-builder">
+                  <div class="builder-section">
+                    <label class="builder-label">Piece:</label>
+                    <div class="builder-buttons">
+                      <button type="button" onclick="state.moveInput += 'K'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♔ K</button>
+                      <button type="button" onclick="state.moveInput += 'Q'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♕ Q</button>
+                      <button type="button" onclick="state.moveInput += 'R'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♖ R</button>
+                      <button type="button" onclick="state.moveInput += 'B'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♗ B</button>
+                      <button type="button" onclick="state.moveInput += 'N'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>♘ N</button>
+                      <button type="button" class="pawn-btn" ${state.gameOver ? 'disabled' : ''} title="Pawn (no letter)">♙</button>
+                    </div>
+                  </div>
+
+                  <div class="builder-section">
+                    <label class="builder-label">Action:</label>
+                    <div class="builder-buttons">
+                      <button type="button" onclick="state.moveInput += 'x'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>× Capture</button>
+                    </div>
+                  </div>
+
+                  <div class="builder-section">
+                    <label class="builder-label">File (a-h):</label>
+                    <div class="builder-buttons files">
+                      ${['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(file => `
+                        <button type="button" onclick="state.moveInput += '${file}'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>${file}</button>
+                      `).join('')}
+                    </div>
+                  </div>
+
+                  <div class="builder-section">
+                    <label class="builder-label">Rank (1-8):</label>
+                    <div class="builder-buttons ranks">
+                      ${['1', '2', '3', '4', '5', '6', '7', '8'].map(rank => `
+                        <button type="button" onclick="state.moveInput += '${rank}'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>${rank}</button>
+                      `).join('')}
+                    </div>
+                  </div>
+
+                  <div class="builder-section">
+                    <label class="builder-label">Special:</label>
+                    <div class="builder-buttons special">
+                      <button type="button" onclick="state.moveInput = 'O-O'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>O-O</button>
+                      <button type="button" onclick="state.moveInput = 'O-O-O'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>O-O-O</button>
+                      <button type="button" onclick="state.moveInput += '='; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>= Promote</button>
+                      <button type="button" onclick="state.moveInput += '+'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}>+ Check</button>
+                      <button type="button" onclick="state.moveInput += '#'; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''}># Mate</button>
+                    </div>
+                  </div>
+
+                  <div class="builder-section">
+                    <div class="builder-buttons">
+                      <button type="button" onclick="state.moveInput = ''; render(); document.getElementById('moveInput').focus()" ${state.gameOver ? 'disabled' : ''} class="clear-btn">
+                        ⌫ Clear
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+
+            ${state.moveHistory.length > 0 ? `
+              <div class="move-history">
+                <h3>Move History</h3>
+                <div class="moves-list">
+                  ${state.moveHistory.map((move, index) => `
+                    <div class="move-pair">
+                      <span class="move-number">${index + 1}.</span>
+                      <span class="player-move">${move.player || '—'}</span>
+                      <span class="computer-move ${index === state.moveHistory.length - 1 ? 'latest' : ''}">
+                        ${move.computer || '—'}
+                      </span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          ${state.showSidebar ? `
+            <div class="sidebar">
+              <h3>Chess Notation Guide</h3>
+
+              <div class="notation-section">
+                <h4>Pieces</h4>
+                <ul>
+                  <li><strong>K</strong> = King</li>
+                  <li><strong>Q</strong> = Queen</li>
+                  <li><strong>R</strong> = Rook</li>
+                  <li><strong>B</strong> = Bishop</li>
+                  <li><strong>N</strong> = Knight</li>
+                  <li>(no letter) = Pawn</li>
+                </ul>
+              </div>
+
+              <div class="notation-section">
+                <h4>Basic Moves</h4>
+                <ul>
+                  <li><code>e4</code> - Pawn to e4</li>
+                  <li><code>Nf3</code> - Knight to f3</li>
+                  <li><code>Bc4</code> - Bishop to c4</li>
+                  <li><code>Qh5</code> - Queen to h5</li>
+                  <li><code>Rad1</code> - Rook from a-file to d1</li>
+                </ul>
+              </div>
+
+              <div class="notation-section">
+                <h4>Captures</h4>
+                <ul>
+                  <li><code>exd5</code> - Pawn on e captures d5</li>
+                  <li><code>Nxe5</code> - Knight captures e5</li>
+                  <li><code>Bxf7+</code> - Bishop captures f7, check</li>
+                </ul>
+              </div>
+
+              <div class="notation-section">
+                <h4>Disambiguation</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem">
+                  When two pieces of the same type can move to the same square:
+                </p>
+                <ul>
+                  <li><code>Nbd7</code> - Knight from b-file to d7</li>
+                  <li><code>N5f3</code> - Knight from rank 5 to f3</li>
+                  <li><code>Qh4e1</code> - Queen from h4 to e1</li>
+                  <li><code>Raxd1</code> - Rook from a-file captures d1</li>
+                  <li><code>R1a3</code> - Rook from rank 1 to a3</li>
+                </ul>
+              </div>
+
+              <div class="notation-section">
+                <h4>Special Moves</h4>
+                <ul>
+                  <li><code>O-O</code> - Castle kingside</li>
+                  <li><code>O-O-O</code> - Castle queenside</li>
+                  <li><code>e8=Q</code> - Pawn promotes to Queen</li>
+                  <li><code>e8=N</code> - Pawn promotes to Knight</li>
+                  <li><code>e8=R</code> - Pawn promotes to Rook</li>
+                  <li><code>e8=B</code> - Pawn promotes to Bishop</li>
+                </ul>
+              </div>
+
+              <div class="notation-section">
+                <h4>Symbols</h4>
+                <ul>
+                  <li><code>+</code> - Check</li>
+                  <li><code>#</code> - Checkmate</li>
+                  <li><code>x</code> - Captures (optional)</li>
+                </ul>
+              </div>
+
+              <div class="notation-section">
+                <h4>Files & Ranks</h4>
+                <ul>
+                  <li><strong>Files:</strong> a-h (columns)</li>
+                  <li><strong>Ranks:</strong> 1-8 (rows)</li>
+                  <li>Example: <code>e4</code> = e-file, 4th rank</li>
+                </ul>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    // Initialize on load
+    window.addEventListener('load', () => {
+      tryInitStockfish();
+      init();
+    });
+  </script>
+</body>
+</html>
