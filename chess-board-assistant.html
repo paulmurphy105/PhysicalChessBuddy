@@ -440,9 +440,10 @@
 
     .builder-buttons.files button,
     .builder-buttons.ranks button {
-      padding: 0.75rem;
-      min-width: 48px;
+      padding: 0.9rem;
+      min-width: 54px;
       font-family: 'Courier New', monospace;
+      font-size: 1rem;
     }
 
     .builder-buttons button:hover:not(:disabled) {
@@ -872,6 +873,35 @@
       render();
     }
 
+    // Take back the last move (undo player + computer moves)
+    function takeBackMove() {
+      if (state.moveHistory.length === 0) return;
+
+      const lastMove = state.moveHistory[state.moveHistory.length - 1];
+
+      // Undo computer's move if it exists
+      if (lastMove.computer) {
+        state.chess.undo();
+      }
+
+      // Undo player's move if it exists
+      if (lastMove.player) {
+        state.chess.undo();
+      }
+
+      // Remove the last move from history
+      state.moveHistory.pop();
+
+      // Update state
+      state.currentTurn = state.chess.turn();
+      state.gameOver = false;
+      state.message = 'Move taken back';
+      state.hint = '';
+
+      render();
+      setTimeout(() => document.getElementById('moveInput')?.focus(), 100);
+    }
+
     // Render board
     function renderBoard() {
       if (!state.chess) return '';
@@ -1034,6 +1064,9 @@
               </button>
               <button type="button" onclick="getHint()" ${state.gameOver ? 'disabled' : ''} style="background: #51cf66; border-color: #51cf66;">
                 💡 Hint
+              </button>
+              <button type="button" onclick="takeBackMove()" ${state.moveHistory.length === 0 ? 'disabled' : ''} style="background: #ffa94d; border-color: #ffa94d;">
+                ↶ Take Back
               </button>
             </form>
 
